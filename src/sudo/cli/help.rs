@@ -10,7 +10,7 @@ usage: sudo -e [-ABknS] [-p prompt] [-D directory] [-g group] [-u user] file ...
 }
 
 fn descriptor() -> &'static str {
-    xlat!("HI! I'm sudo, I will cosplay another user and run your command")
+    xlat!("Hi! I'm sudo. I'll run your command as another user, no cosplay required.")
 }
 
 fn help_msg() -> &'static str {

@@ -7,7 +7,7 @@ usage: sudoedit [-BknS] [-p prompt] [-g group] [-u user] file ..."
 }
 
 fn descriptor() -> &'static str {
-    xlat!("HI! I'm sudoedit. I will cosplay another user and edit the file you need")
+    xlat!("Hi! I'm sudoedit. I'll edit the file as another user, no cosplay required.")
 }
 
 fn help_msg() -> &'static str {

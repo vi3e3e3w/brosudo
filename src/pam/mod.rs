@@ -83,7 +83,7 @@ impl PamContext {
             converser,
             converser_name: converser_name.to_owned(),
             no_interact,
-            auth_prompt: Some(xlat!("Bro! authenticate time").to_owned()),
+            auth_prompt: Some(xlat!("Bro, time to authenticate.").to_owned()),
             error: None,
             panicked: false,
         }));

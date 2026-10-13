@@ -49,7 +49,7 @@ impl fmt::Display for Error {
                 if let Some(other_user) = other_user {
                     xlat_write!(
                         f,
-                        "Oops, user {user}, bro can't use '{command}' as {other_user} in this {hostname}.",
+                        "Oops, {user}, you can't run '{command}' as {other_user} on {hostname}, bro.",
                         user = username,
                         command = command,
                         other_user = other_user,
@@ -58,7 +58,7 @@ impl fmt::Display for Error {
                 } else {
                     xlat_write!(
                         f,
-                        "Oops, user {user}, bro can't use '{command}' in this {hostname}.",
+                        "Oops, {user}, you can't run '{command}' on {hostname}, bro.",
                         user = username,
                         command = command,
                         hostname = hostname,
@@ -87,13 +87,13 @@ Error::SelfCheckNoNewPrivs => {
 }
 
             Error::CommandNotFound(p) => {
-                xlat_write!(f, "'{path}': BRO! command doesn't exist", path = p.display())
+                xlat_write!(f, "'{path}': command not found, bro.", path = p.display())
             }
             Error::InvalidCommand(p) => {
-                xlat_write!(f, "'{path}': Bro! Your command doesn't make sense", path = p.display())
+                xlat_write!(f, "'{path}': that command doesn't look valid, bro.", path = p.display())
             }
-            Error::UserNotFound(u) => xlat_write!(f, "I can't find user '{user}' because it doesn't exist", user = u),
-            Error::GroupNotFound(g) => xlat_write!(f, "I can't find group '{group}' because it doesn't exist", group = g),
+            Error::UserNotFound(u) => xlat_write!(f, "User '{user}' not found.", user = u),
+            Error::GroupNotFound(g) => xlat_write!(f, "Group '{group}' not found.", group = g),
             Error::Authorization(u) => {
                 // TRANSLATORS: This is a well-known quote, try to preserve it in translation.
                 xlat_write!(f, "Awww man, {user}, I can't give you a high because you're not authorized. I'm sorry, bro.", user = u)
@@ -129,13 +129,13 @@ Error::SelfCheckNoNewPrivs => {
             Error::MaxAuthAttempts(num) => {
                 xlat_write!(
                     f,
-                    "You have reached the maximum of {num} incorrect authentication attempts, skill issue",
+                    "You have reached the maximum of {num} incorrect authentication attempts. That's rough, bro.",
                     num = num
                 )
             }
             Error::ChDirNotAllowed { chdir, command } => xlat_write!(
                 f,
-                "Bro, you can't use '--chdir {path}' with '{command}' because this program doesn't like it.",
+                "You can't use '--chdir {path}' with '{command}', bro; this combination isn't supported.",
                 path = chdir.display(),
                 command = command.display()
             ),
@@ -143,21 +143,21 @@ Error::SelfCheckNoNewPrivs => {
                 write!(
                     f,
                     "{}: {string:?}",
-                    xlat!("Bro, You put the unexpected NULL")
+                    xlat!("Unexpected null character, bro.")
                 )
             }
             Error::PathValidation(path) => {
                 write!(
                     f,
                     "{}: {path:?}",
-                    xlat!("Bro, You put the unexpected NULL on input")
+                    xlat!("Unexpected null character in input, bro.")
                 )
             }
             #[cfg(feature = "apparmor")]
             Error::AppArmor(profile, e) => {
                 xlat_write!(
                     f,
-                    "I can't change this {profile} due: {error}",
+                    "I can't change the {profile} profile: {error}",
                     profile = profile,
                     error = e
                 )
