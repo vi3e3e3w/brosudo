@@ -30,18 +30,18 @@ fn read_sudoers() -> Result<Sudoers, Error> {
         // Provide a more helpful error message when the sudoers file is missing
         if e.kind() == std::io::ErrorKind::NotFound {
             Error::Configuration(xlat!(
-                "sudoers file not found: {path}\n\
+                "BRO! You run me, but where is sudoers file? : {path}\n\
                  \n\
-                 The sudoers file is required for sudo-rs to function. Please ensure:\n\
-                 - The file exists at the expected location\n\
-                 - You have the necessary permissions to read it\n\
-                 - If setting up sudo-rs for the first time, create a sudoers file with appropriate permissions\n\
+                 I need sudoers file to work functionally, please make sure:\n\
+                 - You place this file in the expected directory (In the path I told)\n\
+                 - The file you create that need has a correct permission (Wrong permission that lead into someone will fix this file)\n\
+                 - If you are setting up sudo-rs for the first time, please create sudoers file!\n\
                  \n\
-                 For more information, see the sudo-rs documentation.",
+                 For further information, see the sudo-rs documentation.",
                 path = sudoers_path.display()
             ))
         } else {
-            Error::Configuration(xlat!("invalid configuration: {error}", error = e))
+            Error::Configuration(xlat!("{error}: In file sudoers, I don't accept if this file have invald content", error = e))
         }
     })?;
 

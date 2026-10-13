@@ -49,7 +49,7 @@ impl fmt::Display for Error {
                 if let Some(other_user) = other_user {
                     xlat_write!(
                         f,
-                        "Sorry, user {user} is not allowed to execute '{command}' as {other_user} on {hostname}.",
+                        "Oops, user {user}, bro can't use '{command}' as {other_user} in this {hostname}.",
                         user = username,
                         command = command,
                         other_user = other_user,
@@ -58,41 +58,51 @@ impl fmt::Display for Error {
                 } else {
                     xlat_write!(
                         f,
-                        "Sorry, user {user} may not run {command} on {hostname}.",
+                        "Oops, user {user}, bro can't use '{command}' in this {hostname}.",
                         user = username,
                         command = command,
                         hostname = hostname,
                     )
                 }
             }
-            Error::SelfCheckSetuid => {
-                xlat_write!(f, "sudo must be owned by uid 0 and have the setuid bit set")
-            }
-            Error::SelfCheckNoNewPrivs => {
-                xlat_write!(
-                    f,
-                    "The \"no new privileges\" flag is set, which prevents sudo from running as root.\n\
-                    If sudo is running in a container, you may need to adjust the container \
-                    configuration to disable the flag."
-                )
-            }
+
+Error::SelfCheckSetuid => {
+    xlat_write!(
+        f,
+        "Nah, I can't cook without root privileges (UID 0) and the setuid bit set. \
+        Without them, I may run, but I can't switch to the user you requested."
+    )
+}
+Error::SelfCheckNoNewPrivs => {
+    xlat_write!(
+        f,
+        "OH NO! The \"no new privileges\" flag is set, \
+        so I can't gain the privileges I need, bro.\n\
+        If I'm running in a container, check its security configuration \
+        and the intended privilege model.\n\
+        If I'm running on your main machine, review the process security \
+        settings before making changes.\n\
+        Bro, check your security first!"
+    )
+}
+
             Error::CommandNotFound(p) => {
-                xlat_write!(f, "'{path}': command not found", path = p.display())
+                xlat_write!(f, "'{path}': BRO! command doesn't exist", path = p.display())
             }
             Error::InvalidCommand(p) => {
-                xlat_write!(f, "'{path}': invalid command", path = p.display())
+                xlat_write!(f, "'{path}': Bro! Your command doesn't make sense", path = p.display())
             }
-            Error::UserNotFound(u) => xlat_write!(f, "user '{user}' not found", user = u),
-            Error::GroupNotFound(g) => xlat_write!(f, "group '{group}' not found", group = g),
+            Error::UserNotFound(u) => xlat_write!(f, "I can't find user '{user}' because it doesn't exist", user = u),
+            Error::GroupNotFound(g) => xlat_write!(f, "I can't find group '{group}' because it doesn't exist", group = g),
             Error::Authorization(u) => {
                 // TRANSLATORS: This is a well-known quote, try to preserve it in translation.
-                xlat_write!(f, "I'm sorry {user}. I'm afraid I can't do that", user = u)
+                xlat_write!(f, "Awww man, {user}, I can't give you a high because you're not authorized. I'm sorry, bro.", user = u)
             }
-            Error::InteractionRequired => xlat_write!(f, "interactive authentication is required"),
+            Error::InteractionRequired => xlat_write!(f, "Bro! I need your password, otherwise I have to refuse."),
             Error::EnvironmentVar(vs) => {
                 xlat_write!(
                     f,
-                    "you are not allowed to set the following environment variables:"
+                    "Bro! What are you doing with your environment? Your environment variables are:"
                 )?;
                 let mut sep = "";
                 for v in vs {
@@ -108,24 +118,24 @@ impl fmt::Display for Error {
                 if let Some(path) = location {
                     xlat_write!(
                         f,
-                        "cannot execute '{path}': {error}",
+                        "I can't execute '{path}': {error}",
                         path = path.display(),
                         error = e
                     )
                 } else {
-                    xlat_write!(f, "IO error: {error}", error = e)
+                    xlat_write!(f, "Oh! Your IO is broken, and it tells me: {error}", error = e)
                 }
             }
             Error::MaxAuthAttempts(num) => {
                 xlat_write!(
                     f,
-                    "maximum {num} incorrect authentication attempts",
+                    "You have reached the maximum of {num} incorrect authentication attempts, skill issue",
                     num = num
                 )
             }
             Error::ChDirNotAllowed { chdir, command } => xlat_write!(
                 f,
-                "you are not allowed to use '--chdir {path}' with '{command}'",
+                "Bro, you can't use '--chdir {path}' with '{command}' because this program doesn't like it.",
                 path = chdir.display(),
                 command = command.display()
             ),
@@ -133,21 +143,21 @@ impl fmt::Display for Error {
                 write!(
                     f,
                     "{}: {string:?}",
-                    xlat!("Unexpected null character in input")
+                    xlat!("Bro, You put the unexpected NULL")
                 )
             }
             Error::PathValidation(path) => {
                 write!(
                     f,
                     "{}: {path:?}",
-                    xlat!("Unexpected null character in input")
+                    xlat!("Bro, You put the unexpected NULL on input")
                 )
             }
             #[cfg(feature = "apparmor")]
             Error::AppArmor(profile, e) => {
                 xlat_write!(
                     f,
-                    "unable to change AppArmor profile to {profile}: {error}",
+                    "I can't change this {profile} due: {error}",
                     profile = profile,
                     error = e
                 )
