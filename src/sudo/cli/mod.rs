@@ -629,7 +629,7 @@ impl SudoOptions {
             } else if self.reset_timestamp {
                 SudoAction::ResetTimestamp(self.try_into()?)
             } else {
-                return Err(xlat!("expected one of these actions: --help, --version, --remove-timestamp, --validate, --list, --edit, --login, --shell, a command as a positional argument, --reset-timestamp").into());
+                return Err(xlat!("Bro...What should I do?: --help, --version, --remove-timestamp, --validate, --list, --edit, --login, --shell, a command as a positional argument, --reset-timestamp").into());
             }
         };
 
