@@ -224,7 +224,7 @@ impl TryFrom<SudoOptions> for SudoEditOptions {
         reject_all("--edit", opts)?;
 
         if positional_args.is_empty() {
-            return Err(xlat!("must specify at least one file path").into());
+            return Err(xlat!("You need at least one file path, bro").into());
         }
 
         Ok(Self {
@@ -502,7 +502,7 @@ enum SudoArg {
 
 fn demand_utf8(arg: &OsStr) -> String {
     xlat!(
-        "argument '{arg}' is not valid UTF-8",
+        "Argument '{arg}' is not valid UTF-8 — encoding is cooked",
         arg = DisplayOsStr(arg)
     )
 }
@@ -541,7 +541,7 @@ impl SudoArg {
                     // `--preserve-env` is special as it only takes an argument using this `key=value` syntax
                     if !Self::TAKES_ARGUMENT.contains(&key) && key != "preserve-env" {
                         Err(xlat!(
-                            "'{option}' does not take any arguments",
+                            "'{option}' does not take arguments, bro",
                             option = key
                         ))?;
                     }
@@ -553,7 +553,7 @@ impl SudoArg {
                             .map_err(|_| demand_utf8(&next))?;
                         processed.push(SudoArg::Argument(arg, next.to_owned()));
                     } else {
-                        Err(xlat!("'{option}' expects an argument", option = arg))?;
+                        Err(xlat!("'{option}' needs an argument, bro", option = arg))?;
                     }
                 } else {
                     let arg = String::from_utf8(arg.into_encoded_bytes()).expect("already checked");
@@ -574,7 +574,7 @@ impl SudoArg {
 
                         // assignment syntax is not accepted for shorthand arguments
                         if next == Some('=') {
-                            Err(xlat!("invalid option '='"))?;
+                            Err(xlat!("Option '=' is invalid — syntax took an L"))?;
                         }
                         if next.is_some() {
                             processed.push(SudoArg::Argument(flag, rest.to_string()));
@@ -586,7 +586,7 @@ impl SudoArg {
                             // short version of --help has no arguments
                             processed.push(SudoArg::Flag(flag));
                         } else {
-                            Err(xlat!("'{option}' expects an argument", option = flag))?;
+                            Err(xlat!("'{option}' needs an argument, bro", option = flag))?;
                         }
                         break;
                     } else {
@@ -713,7 +713,7 @@ impl SudoOptions {
                         options.validate = true;
                     }
                     _option => {
-                        Err(xlat!("invalid option provided"))?;
+                        Err(xlat!("Invalid option — that flag is not the vibe, bro"))?;
                     }
                 },
                 SudoArg::Argument(option, value) => match option.as_str() {
@@ -742,7 +742,7 @@ impl SudoOptions {
                         options.user = Some(SudoString::from_cli_string(value));
                     }
                     _option => {
-                        Err(xlat!("invalid option provided"))?;
+                        Err(xlat!("Invalid option — that flag is not the vibe, bro"))?;
                     }
                 },
                 SudoArg::Environment(key, value) => {
@@ -760,7 +760,9 @@ impl SudoOptions {
                             && !is_dir
                             && (cmd.ends_with("sudoedit") || cmd.ends_with("sudoedit-rs"))
                         {
-                            user_warn!("sudoedit doesn't need to be run via sudo");
+                            user_warn!(
+                                "sudoedit does not need sudo — redundant vibes detected, bro"
+                            );
                             options.edit = true;
                             rest.remove(0);
                         }

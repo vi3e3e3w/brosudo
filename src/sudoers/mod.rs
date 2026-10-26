@@ -636,8 +636,12 @@ fn match_user(user: &impl UnixUser) -> impl Fn(&UserSpecifier) -> bool + '_ {
         // nonunix-groups, netgroups, etc. are not implemented
         UserSpecifier::NonunixGroup(group) => {
             match group {
-                Identifier::Name(name) => auth_warn!("warning: non-unix group {name} was ignored"),
-                Identifier::ID(num) => auth_warn!("warning: non-unix group #{num} was ignored"),
+                Identifier::Name(name) => {
+                    auth_warn!("warning: non-Unix group {name} got ignored, bro")
+                }
+                Identifier::ID(num) => {
+                    auth_warn!("warning: non-Unix group #{num} got ignored, bro")
+                }
             }
 
             false
@@ -662,7 +666,9 @@ fn match_group_alias(group: &impl UnixGroup) -> impl Fn(&UserSpecifier) -> bool 
         /* the parser does not allow this, but can happen due to Runas_Alias,
          * see https://github.com/trifectatechfoundation/sudo-rs/issues/13 */
         _ => {
-            auth_warn!("warning: ignoring %group syntax in runas_alias for checking sudo -g");
+            auth_warn!(
+                "warning: %group syntax in runas_alias is not the vibe for sudo -g; ignoring it"
+            );
             false
         }
     }

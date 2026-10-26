@@ -41,7 +41,7 @@ fn read_sudoers() -> Result<Sudoers, Error> {
                 path = sudoers_path.display()
             ))
         } else {
-            Error::Configuration(xlat!("{error}: The sudoers file contains invalid content.", error = e))
+            Error::Configuration(xlat!("{error}: sudoers content is cooked — invalid config, bro.", error = e))
         }
     })?;
 
@@ -217,7 +217,9 @@ fn auth_and_update_record_file(
             match record_file.create(scope, &auth_user) {
                 Ok(_) => (),
                 Err(e) => {
-                    auth_warn!("Could not update session record file with new record: {e}");
+                    auth_warn!(
+                        "Could not update the session record: {e} — record update took an L."
+                    );
                 }
             }
         }
@@ -250,14 +252,14 @@ fn determine_auth_status(
                         AuthStatus::new(true, Some(sr))
                     }
                     Err(e) => {
-                        auth_warn!("Unexpected error while reading session information: {e}");
+                        auth_warn!("Unexpected session-info plot twist: {e}");
                         AuthStatus::new(true, None)
                     }
                 }
             }
             // if we cannot open the session record file we just assume there is none and continue as normal
             Err(e) => {
-                auth_warn!("Could not use session information: {e}");
+                auth_warn!("Session info is unavailable: {e} — continuing with low-key vibes.");
                 AuthStatus::new(true, None)
             }
         }

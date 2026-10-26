@@ -44,7 +44,7 @@ pub(super) fn edit_files(
             io::Error::new(
                 e.kind(),
                 xlat!(
-                    "failed to read metadata for {path}: {error}",
+                    "Could not read metadata for {path}: {error} — filesystem said no, bro",
                     path = path.display(),
                     error = e
                 ),
@@ -52,7 +52,7 @@ pub(super) fn edit_files(
         })?;
         if !metadata.is_file() {
             return Err(io::Error::other(xlat!(
-                "file {path} is not a regular file",
+                "File {path} is not a regular file — wrong format, bro",
                 path = path.display()
             )));
         }
@@ -62,7 +62,7 @@ pub(super) fn edit_files(
             io::Error::new(
                 e.kind(),
                 xlat!(
-                    "failed to lock {path}: {error}",
+                    "Could not lock {path}: {error} — lock vibes are off",
                     path = path.display(),
                     error = e
                 ),
@@ -75,7 +75,7 @@ pub(super) fn edit_files(
             io::Error::new(
                 e.kind(),
                 xlat!(
-                    "failed to read {path}: {error}",
+                    "Could not read {path}: {error} — read attempt took an L",
                     path = path.display(),
                     error = e
                 ),
@@ -142,7 +142,10 @@ pub(super) fn edit_files(
         let data = file.new_data.expect("filled in above");
         if data == file.old_data {
             // File unchanged. No need to write it again.
-            user_info!("{path} unchanged", path = file.path.display());
+            user_info!(
+                "{path} is unchanged — no edit, no drama",
+                path = file.path.display()
+            );
             continue;
         }
 
@@ -162,7 +165,7 @@ pub(super) fn edit_files(
             io::Error::new(
                 e.kind(),
                 xlat!(
-                    "failed to write {path}: {error}",
+                    "Could not write {path}: {error} — write vibes are cooked",
                     path = file.path.display(),
                     error = e
                 ),
@@ -181,7 +184,7 @@ impl Drop for TempDirDropGuard {
     fn drop(&mut self) {
         if let Err(e) = std::fs::remove_dir_all(&self.0) {
             user_error!(
-                "failed to remove temporary directory {path}: {error}",
+                "Could not remove temporary directory {path}: {error} — temp-dir cleanup took an L",
                 path = self.0.display(),
                 error = e
             );
@@ -204,23 +207,26 @@ fn handle_child_inner(
     editor: (PathBuf, Vec<OsString>),
     mut files: Vec<ChildFileInfo<'_>>,
 ) -> Result<(), String> {
-    mark_fds_as_cloexec().map_err(|e| format!("Failed to mark fds as CLOEXEC: {e}"))?;
+    mark_fds_as_cloexec()
+        .map_err(|e| format!("Could not mark fds as CLOEXEC: {e} — fd vibes are off"))?;
 
     // root privileges are dangerous after this point, since we are about to manipulate the
     // file system and execute a command under control of the user, so drop them
     audit::irrevocably_drop_privileges();
 
-    let tempdir = TempDirDropGuard(
-        create_temporary_dir()
-            .map_err(|e| xlat!("failed to create temporary directory: {error}", error = e))?,
-    );
+    let tempdir = TempDirDropGuard(create_temporary_dir().map_err(|e| {
+        xlat!(
+            "Could not create a temporary directory: {error} — temp vibes are cooked",
+            error = e
+        )
+    })?);
 
     for (i, file) in files.iter_mut().enumerate() {
         // Create temp file
         let dir = tempdir.0.join(format!("{i}"));
         std::fs::create_dir(&dir).map_err(|e| {
             xlat!(
-                "failed to create temporary directory {path}: {error}",
+                "Could not create temporary directory {path}: {error} — directory spawn took an L",
                 path = dir.display(),
                 error = e
             )
@@ -234,7 +240,7 @@ fn handle_child_inner(
             .open(&tempfile_path)
             .map_err(|e| {
                 xlat!(
-                    "failed to create temporary file {path}: {error}",
+                    "Could not create temporary file {path}: {error} — file spawn took an L",
                     path = tempfile_path.display(),
                     error = e
                 )
@@ -243,7 +249,7 @@ fn handle_child_inner(
         // Write to temp file
         tempfile.write_all(&file.old_data).map_err(|e| {
             xlat!(
-                "failed to write to temporary file {path}: {error}",
+                "Could not write to temporary file {path}: {error} — write vibes are cooked",
                 path = tempfile_path.display(),
                 error = e
             )
@@ -263,7 +269,7 @@ fn handle_child_inner(
         .status()
         .map_err(|e| {
             xlat!(
-                "failed to run editor {path}: {error}",
+                "Could not run editor {path}: {error} — editor did not pass the vibe check",
                 path = editor.0.display(),
                 error = e
             )
@@ -284,7 +290,7 @@ fn handle_child_inner(
         // Read from temp file
         let new_data = std::fs::read(tempfile_path).map_err(|e| {
             xlat!(
-                "failed to read from temporary file {path}: {error}",
+                "Could not read from temporary file {path}: {error} — read attempt took an L",
                 path = tempfile_path.display(),
                 error = e
             )
@@ -293,7 +299,7 @@ fn handle_child_inner(
         // FIXME preserve temporary file if the original couldn't be written to
         std::fs::remove_file(tempfile_path).map_err(|e| {
             xlat!(
-                "failed to remove temporary file {path}: {error}",
+                "Could not remove temporary file {path}: {error} — cleanup took an L",
                 path = tempfile_path.display(),
                 error = e
             )
@@ -319,11 +325,18 @@ fn handle_child_inner(
                 // a fallback: also accept 'yes' based on Debian's apt behaviour
                 Ok('y') if !answers.contains('y') => {}
                 _ => {
-                    user_info!("not overwriting {path}", path = file.path.display());
+                    user_info!(
+                        "Not overwriting {path} — keeping the original, bro",
+                        path = file.path.display()
+                    );
 
                     // Parent ignores write when new data matches old data
-                    write_stream(&mut file.new_data_tx, &file.old_data)
-                        .map_err(|e| xlat!("failed to write data to parent: {error}", error = e))?;
+                    write_stream(&mut file.new_data_tx, &file.old_data).map_err(|e| {
+                        xlat!(
+                            "Could not send data to parent: {error} — pipe vibes are cooked",
+                            error = e
+                        )
+                    })?;
 
                     continue;
                 }
@@ -331,8 +344,12 @@ fn handle_child_inner(
         }
 
         // Write to socket
-        write_stream(&mut file.new_data_tx, &new_data)
-            .map_err(|e| xlat!("failed to write data to parent: {error}", error = e))?;
+        write_stream(&mut file.new_data_tx, &new_data).map_err(|e| {
+            xlat!(
+                "Could not send data to parent: {error} — pipe vibes are cooked",
+                error = e
+            )
+        })?;
     }
 
     process::exit(0);

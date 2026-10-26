@@ -29,10 +29,10 @@ fn unstable_warning() {
 
     if check_var != "I accept that my system may break unexpectedly" {
         eprintln_ignore_io_error!(
-            "WARNING!
+            "WARNING, BRO — DEVELOPMENT VIBES!
 Sudo-rs is compiled with development logs on, which means it is less secure and could potentially
-break your system. We recommend that you do not run this on any production environment.
-To turn off this warning and use sudo-rs you need to set the environment variable
+break your system. Do not run this on production, no cap.
+To turn off this warning and use sudo-rs, set the environment variable
 SUDO_RS_IS_UNSTABLE to the value `I accept that my system may break unexpectedly`."
         );
 

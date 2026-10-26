@@ -42,9 +42,9 @@ macro_rules! io_msg {
 pub fn main() {
     if User::effective_uid() != User::real_uid() || User::effective_gid() != User::real_gid() {
         println_ignore_io_error!(
-            "Visudo must not be installed as setuid binary.\n\
-             Please notify your packager about this misconfiguration.\n\
-             To prevent privilege escalation visudo will now abort.
+            "Visudo cannot be installed as a setuid binary, bro.\n\
+             Tell your packager this setup is cooked.\n\
+             To prevent privilege escalation, visudo is aborting now.
              "
         );
         std::process::exit(1);
@@ -152,15 +152,19 @@ fn run(file_arg: Option<&str>, perms: bool, owner: bool) -> io::Result<()> {
             .map_err(|err| {
                 io_msg!(
                     err,
-                    "Failed to open existing sudoers file at {sudoers_path:?}"
+                    "Could not open existing sudoers file at {sudoers_path:?} — file vibes are off"
                 )
             })?;
 
         (file, true)
     } else {
         // Create a sudoers file if it doesn't exist.
-        let file = File::create(sudoers_path)
-            .map_err(|err| io_msg!(err, "Failed to create sudoers file at {sudoers_path:?}"))?;
+        let file = File::create(sudoers_path).map_err(|err| {
+            io_msg!(
+                err,
+                "Could not create sudoers file at {sudoers_path:?} — creation took an L"
+            )
+        })?;
 
         // ogvisudo sets the permissions of the file so it can be read and written by the user and
         // read by the group if the `-f` argument was passed.
@@ -169,7 +173,7 @@ fn run(file_arg: Option<&str>, perms: bool, owner: bool) -> io::Result<()> {
                 .map_err(|err| {
                     io_msg!(
                         err,
-                        "Failed to set permissions on new sudoers file at {sudoers_path:?}"
+                        "Could not set permissions on new sudoers file at {sudoers_path:?} — permission vibes are cooked"
                     )
                 })?;
         }
@@ -254,7 +258,10 @@ fn edit_sudoers_file(
     let current_user: User = match CurrentUser::resolve() {
         Ok(user) => user.into(),
         Err(err) => {
-            writeln!(stderr, "visudo: cannot resolve : {err}")?;
+            writeln!(
+                stderr,
+                "visudo: could not resolve the current user — identity vibes are off: {err}"
+            )?;
             return Ok(());
         }
     };
@@ -424,10 +431,13 @@ pub(crate) fn ask_response(
             {
                 return Ok(answer.chars().next().unwrap());
             }
-            Some(Ok(answer)) => writeln!(stderr, "Invalid option: '{answer}'\n",)?,
-            Some(Err(err)) => writeln!(stderr, "Invalid response: {err}\n",)?,
+            Some(Ok(answer)) => writeln!(stderr, "Invalid response, bro: '{answer}'\n",)?,
+            Some(Err(err)) => writeln!(stderr, "Response vibes are invalid: {err}\n",)?,
             None => {
-                writeln!(stderr, "visudo: cannot read user input")?;
+                writeln!(
+                    stderr,
+                    "visudo: could not read user input — input vibes are off"
+                )?;
                 return Ok(safe_choice);
             }
         }

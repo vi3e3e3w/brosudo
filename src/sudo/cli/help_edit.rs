@@ -13,17 +13,16 @@ fn descriptor() -> &'static str {
 fn help_msg() -> &'static str {
     xlat!(
         "Options:
-  -B, --bell                    ring bell when prompting
-  -g, --group=group             run command as the specified group name or ID
-  -h, --help                    display help message and exit
-  -k, --reset-timestamp         invalidate timestamp file
-  -n, --non-interactive         non-interactive mode, no prompts are used
+  -B, --bell                    ring the bell when prompting
+  -g, --group=group             run as the specified group name or ID
+  -h, --help                    display this help and exit, no cap
+  -k, --reset-timestamp         invalidate the timestamp file
+  -n, --non-interactive         non-interactive mode, no prompts
   -p, --prompt=prompt           use the specified password prompt
-  -S, --stdin                   read password from standard input
-  -u, --user=user               run command (or edit file) as specified user
-                                name or ID
+  -S, --stdin                   read the password from standard input
+  -u, --user=user               edit as the specified user name or ID
   -V, --version                 display version information and exit
-  --                            stop processing command line arguments"
+  --                            stop processing command-line arguments"
     )
 }
 

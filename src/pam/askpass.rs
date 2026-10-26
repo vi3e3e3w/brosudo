@@ -39,7 +39,7 @@ pub(super) fn spawn_askpass(program: &Path, prompt: &str) -> io::Result<(Process
 
 fn handle_child(program: &Path, prompt: &str, stdout: OwnedFd) -> ! {
     if let Err(e) = mark_fds_as_cloexec() {
-        eprintln_ignore_io_error!("Failed to mark fds as CLOEXEC: {e}");
+        eprintln_ignore_io_error!("Could not mark fds as CLOEXEC: {e} — fd vibes are off.");
         process::exit(1);
     };
 
@@ -50,7 +50,7 @@ fn handle_child(program: &Path, prompt: &str, stdout: OwnedFd) -> ! {
     // Exec askpass program
     let error = Command::new(program).arg(prompt).stdout(stdout).exec();
     user_error!(
-        "Failed to run askpass program {path}: {error}",
+        "Could not run askpass program {path}: {error} — prompt vibes are cooked",
         path = program.display(),
         error = error
     );

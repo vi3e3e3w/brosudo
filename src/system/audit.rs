@@ -207,17 +207,17 @@ fn checks(path: &Path, meta: Metadata) -> io::Result<()> {
     let path_mode = meta.permissions().mode();
     if meta.uid() != 0 {
         Err(error(xlat!(
-            "{path} must be owned by root",
+            "{path} must be owned by root, bro",
             path = path.display()
         )))
     } else if meta.gid() != 0 && (path_mode & mode(Category::Group, Op::Write) != 0) {
         Err(error(xlat!(
-            "{path} cannot be group-writable",
+            "{path} cannot be group-writable — group-write vibes are unsafe",
             path = path.display()
         )))
     } else if path_mode & mode(Category::World, Op::Write) != 0 {
         Err(error(xlat!(
-            "{path} cannot be world-writable",
+            "{path} cannot be world-writable — public-write vibes are unsafe",
             path = path.display()
         )))
     } else {
@@ -389,7 +389,7 @@ fn traversed_secure_open(
     let Some(file_name) = path.file_name() else {
         return Err(io::Error::new(
             ErrorKind::InvalidInput,
-            xlat!("invalid path"),
+            xlat!("Path is invalid, bro"),
         ));
     };
 
@@ -397,7 +397,7 @@ fn traversed_secure_open(
     if components.next() != Some(Component::RootDir) {
         return Err(io::Error::new(
             ErrorKind::InvalidInput,
-            xlat!("path must be absolute"),
+            xlat!("Path must be absolute, bro"),
         ));
     }
 
@@ -409,7 +409,7 @@ fn traversed_secure_open(
             // Owner can change file permissions
             return Err(io::Error::new(
                 ErrorKind::PermissionDenied,
-                xlat!("cannot open a file in a path writable by the user"),
+                xlat!("Cannot open a file in a user-writable path — unsafe vibes"),
             ));
         }
 
@@ -433,7 +433,7 @@ fn traversed_secure_open(
         if user_has_write_perms {
             Err(io::Error::new(
                 ErrorKind::PermissionDenied,
-                xlat!("cannot open a file in a path writable by the user"),
+                xlat!("Cannot open a file in a user-writable path — unsafe vibes"),
             ))
         } else {
             Ok(())
@@ -451,7 +451,7 @@ fn traversed_secure_open(
             _ => {
                 return Err(io::Error::new(
                     ErrorKind::InvalidInput,
-                    xlat!("error in provided path"),
+                    xlat!("Error in the provided path — path vibes are cooked"),
                 ));
             }
         };

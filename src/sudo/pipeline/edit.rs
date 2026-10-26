@@ -36,19 +36,19 @@ pub fn run_edit(edit_opts: SudoEditOptions) -> Result<(), Error> {
                 }
                 Err(error) => {
                     user_error!(
-                        "error opening {path}: {error}",
+                        "Could not open {path}: {error} — file vibes are off",
                         path = DisplayOsStr(arg),
                         error = error,
                     )
                 }
             }
         } else {
-            user_error!("invalid path: {path}", path = DisplayOsStr(arg));
+            user_error!("Path is invalid, bro: {path}", path = DisplayOsStr(arg));
         }
     }
 
     if opened_files.len() != context.files_to_edit.len() {
-        user_info!("please address the problems and try again");
+        user_info!("Fix the vibes above, then run it back.");
         return Err(Error::Silent);
     }
 

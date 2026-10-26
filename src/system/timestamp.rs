@@ -63,7 +63,7 @@ impl SessionRecordFile {
             Some(magic) if magic == Self::MAGIC_NUM => (),
             x => {
                 if let Some(_magic) = x {
-                    auth_info!("Session records file for user '{for_user}' is invalid, resetting");
+                    auth_info!("Session record for user '{for_user}' is cooked; resetting it, bro");
                 }
 
                 session_records.init(Self::VERSION_OFFSET)?;
@@ -76,13 +76,11 @@ impl SessionRecordFile {
             x => {
                 if let Some(v) = x {
                     auth_info!(
-                        "Session records file for user '{for_user}' has invalid version {v}, only file version {} is supported, resetting",
+                        "Session record for user '{for_user}' has invalid version {v}; resetting, bro (only version {} is supported)",
                         Self::FILE_VERSION
                     );
                 } else {
-                    auth_info!(
-                        "Session records file did not contain file version information, resetting"
-                    );
+                    auth_info!("Session record had no version information; resetting it, bro");
                 }
 
                 session_records.init(Self::FIRST_RECORD_OFFSET)?;
@@ -433,7 +431,7 @@ impl RecordScope {
                 init_time,
             })
         } else {
-            auth_warn!("Could not get terminal foreground process starting time");
+            auth_warn!("Could not get the terminal foreground start time — timing said no");
             None
         }
     }
@@ -452,7 +450,7 @@ impl RecordScope {
                 init_time,
             })
         } else {
-            auth_warn!("Could not get parent process starting time");
+            auth_warn!("Could not get the parent process start time — timing said no");
             None
         }
     }

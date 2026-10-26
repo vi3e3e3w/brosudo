@@ -66,39 +66,53 @@ impl fmt::Display for Error {
                 }
             }
 
-Error::SelfCheckSetuid => {
-    xlat_write!(
-        f,
-        "Nah, I can't cook without root privileges (UID 0) and the setuid bit set. \
+            Error::SelfCheckSetuid => {
+                xlat_write!(
+                    f,
+                    "Nah, I can't cook without root privileges (UID 0) and the setuid bit set. \
         Without them, I may run, but I can't switch to the user you requested."
-    )
-}
-Error::SelfCheckNoNewPrivs => {
-    xlat_write!(
-        f,
-        "OH NO! The \"no new privileges\" flag is set, \
+                )
+            }
+            Error::SelfCheckNoNewPrivs => {
+                xlat_write!(
+                    f,
+                    "OH NO! The \"no new privileges\" flag is set, \
         so I can't gain the privileges I need, bro.\n\
         If I'm running in a container, check its security configuration \
         and the intended privilege model.\n\
         If I'm running on your main machine, review the process security \
         settings before making changes.\n\
         Bro, check your security first!"
-    )
-}
+                )
+            }
 
             Error::CommandNotFound(p) => {
                 xlat_write!(f, "'{path}': command not found, bro.", path = p.display())
             }
             Error::InvalidCommand(p) => {
-                xlat_write!(f, "'{path}': that command doesn't look valid, bro.", path = p.display())
+                xlat_write!(
+                    f,
+                    "'{path}': that command doesn't look valid, bro.",
+                    path = p.display()
+                )
             }
-            Error::UserNotFound(u) => xlat_write!(f, "User '{user}' not found.", user = u),
-            Error::GroupNotFound(g) => xlat_write!(f, "Group '{group}' not found.", group = g),
+            Error::UserNotFound(u) => {
+                xlat_write!(f, "User '{user}' is not in the chat, bro.", user = u)
+            }
+            Error::GroupNotFound(g) => {
+                xlat_write!(f, "Group '{group}' is not in the chat, bro.", group = g)
+            }
             Error::Authorization(u) => {
                 // TRANSLATORS: This is a well-known quote, try to preserve it in translation.
-                xlat_write!(f, "Awww man, {user}, I can't give you a high because you're not authorized. I'm sorry, bro.", user = u)
+                xlat_write!(
+                    f,
+                    "Awww man, {user}, I can't give you a high because you're not authorized. I'm sorry, bro.",
+                    user = u
+                )
             }
-            Error::InteractionRequired => xlat_write!(f, "Bro! I need your password, otherwise I have to refuse."),
+            Error::InteractionRequired => {
+                xlat_write!(f, "Bro! I need your password, otherwise I have to refuse.")
+            }
             Error::EnvironmentVar(vs) => {
                 xlat_write!(
                     f,
@@ -118,12 +132,12 @@ Error::SelfCheckNoNewPrivs => {
                 if let Some(path) = location {
                     xlat_write!(
                         f,
-                        "I can't execute '{path}': {error}",
+                        "I can't execute '{path}': {error} — that's an L, bro.",
                         path = path.display(),
                         error = e
                     )
                 } else {
-                    xlat_write!(f, "Oh! Your IO is broken, and it tells me: {error}", error = e)
+                    xlat_write!(f, "Oh! Your I/O is cooked, and it says: {error}", error = e)
                 }
             }
             Error::MaxAuthAttempts(num) => {

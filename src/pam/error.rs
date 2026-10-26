@@ -208,15 +208,23 @@ impl From<Utf8Error> for PamError {
 impl fmt::Display for PamError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PamError::UnexpectedNulByte(_) => xlat_write!(f, "Unexpected null character in input"),
-            PamError::Utf8Error(_) => xlat_write!(f, "Could not read input data as UTF-8 string"),
+            PamError::UnexpectedNulByte(_) => {
+                xlat_write!(f, "Unexpected null character in input, bro")
+            }
+            PamError::Utf8Error(_) => xlat_write!(
+                f,
+                "Could not read input as UTF-8 — encoding vibes are cooked"
+            ),
             PamError::Pam(PamErrorType::AuthError) => {
-                xlat_write!(f, "Account validation failure, is your account locked?")
+                xlat_write!(
+                    f,
+                    "Account validation failed — is your account locked, bro?"
+                )
             }
             PamError::Pam(PamErrorType::NewAuthTokenRequired) => {
                 xlat_write!(
                     f,
-                    "Account or password is expired, reset your password and try again"
+                    "Account or password is expired — reset it and run it back, bro"
                 )
             }
             PamError::Pam(PamErrorType::AuthTokenExpired) => {
