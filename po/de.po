@@ -18,9 +18,8 @@ msgstr ""
 #. TRANSLATORS: This is a well-known quote, try to preserve it in translation.
 #: src/common/error.rs:89
 #, rust-format
-msgid "I'm sorry {user}. I'm afraid I can't do that"
-msgstr "Es tut mir leid, {user}. Ich fürchte, das kann ich nicht"
-
+msgid "Awww man, {user}, I can't give you a high because you're not authorized. I'm sorry, bro."
+msgstr "Tut mir leid, {user}, aber ich kann dir keine erhöhten Rechte gewähren, da du nicht dazu berechtigt bist. Tut mir leid, Bro."
 #: src/sudoers/entry/verbose.rs:33
 msgid "Commands:"
 msgstr "Befehle:"
@@ -50,12 +49,12 @@ msgstr "Cwd"
 
 #: src/pam/askpass.rs:55
 #, rust-format
-msgid "Failed to run askpass program {path}: {error}"
+msgid "Could not run askpass program {path}: {error} — prompt vibes are cooked"
 msgstr "Das Askpass-Programm {path} konnte nicht ausgeführt werden: {error}"
 
 #: src/pam/error.rs:211 src/common/error.rs:136 src/common/error.rs:143
-msgid "Unexpected null character in input"
-msgstr "Unerwartetes Null-Zeichen in der Eingabe"
+msgid "Unexpected null character in input, bro."
+msgstr "Unerwartetes Nullzeichen in der Eingabe, Bro"
 
 #: src/pam/error.rs:212
 msgid "Could not read input data as UTF-8 string"
